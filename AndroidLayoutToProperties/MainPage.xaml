@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="AndroidLayoutToProperties.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AndroidLayoutToProperties"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Input" FontSize="20" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" x:Name="InputBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" AcceptsReturn="True"/>
+            </Grid>            
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Output" FontSize="20" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" x:Name="OutputBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" AcceptsReturn="True"/>
+            </Grid>
+        </Grid>
+        <Button Grid.Row="1" Content="Do stuff!" HorizontalAlignment="Stretch" Margin="20" Click="DoTheThing"/>
+        
+    </Grid>
+</Page>
