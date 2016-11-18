@@ -52,7 +52,8 @@ namespace AndroidLayoutToProperties
 
         private IEnumerable<XElement> GetNodesWithId(XElement rootElement)
         {
-            if(rootElement.HasElements)
+            if (rootElement.HasElements)
+            {
                 foreach (var xElement in rootElement.Elements())
                 {
                     foreach (var element in GetNodesWithId(xElement))
@@ -60,18 +61,18 @@ namespace AndroidLayoutToProperties
                         yield return element;
                     }
                 }
-            else
+            }
+
+            if (rootElement.HasAttributes)
             {
-                if (rootElement.HasAttributes)
+                var attr = rootElement.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "id");
+                if(attr != null)
                 {
-                    var attr = rootElement.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "id");
-                    if(attr != null)
-                    {
-                        if(attr.Value.StartsWith("@+id/"))
-                            yield return rootElement;
-                    }
+                    if(attr.Value.StartsWith("@+id/"))
+                        yield return rootElement;
                 }
             }
+            
         }
 
         private string FirstToLower(string input)
