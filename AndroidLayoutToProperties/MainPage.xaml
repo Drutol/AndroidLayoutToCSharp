@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Margin="20">
             <Grid.ColumnDefinitions>
@@ -34,7 +35,11 @@
                 <TextBox Grid.Row="1" x:Name="OutputBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" AcceptsReturn="True"/>
             </Grid>
         </Grid>
-        <Button Grid.Row="1" Content="Do stuff!" HorizontalAlignment="Stretch" Margin="20" Click="DoTheThing"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,5">
+            <CheckBox x:Name="ViewHolderCheckbox" Content="ViewHolder"/>
+            <CheckBox x:Name="RegionCheckBox" IsChecked="True" Content="Region"/>
+        </StackPanel>
+        <Button Grid.Row="2" Content="Do stuff!" HorizontalAlignment="Stretch" Margin="20" Click="DoTheThing"/>
         
     </Grid>
 </Page>

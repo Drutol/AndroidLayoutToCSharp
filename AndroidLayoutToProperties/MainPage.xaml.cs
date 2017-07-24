@@ -30,24 +30,46 @@ namespace AndroidLayoutToProperties
             this.InitializeComponent();
         }
 
-        private void DoTheThing(object sender, RoutedEventArgs e)
+        private void DoTheThing(object sender, RoutedEventArgs ee)
         {
-            var layout = XDocument.Parse(InputBox.Text);
-            var nodes = GetNodesWithId(layout.Root).Select(element => new ElementEntry(element));
-            
-            var outputFields = new StringBuilder();
-            var outputProperties = new StringBuilder();
-
-            foreach (var elementEntry in nodes)
+            try
             {
-                var field = FirstToLower(elementEntry.Name);
-                outputFields.AppendLine($"private {elementEntry.Type} _{field};");
-                outputProperties.AppendLine(
-                    $"public {elementEntry.Type} {FirstToUpper(elementEntry.Name)} => _{field} ?? (_{field} = FindViewById<{elementEntry.Type}>(Resource.Id.{elementEntry.Name}));\n");
+
+
+                var layout = XDocument.Parse(InputBox.Text);
+                var nodes = GetNodesWithId(layout.Root).Select(element => new ElementEntry(element));
+
+                var outputFields = new StringBuilder();
+                var outputProperties = new StringBuilder();
+
+                foreach (var elementEntry in nodes)
+                {
+                    var field = FirstToLower(elementEntry.Name);
+                    outputFields.AppendLine($"private {elementEntry.Type} _{field};");
+                    outputProperties.AppendLine(
+                        $"public {elementEntry.Type} {FirstToUpper(elementEntry.Name)} => _{field} ?? (_{field} = FindViewById<{elementEntry.Type}>(Resource.Id.{elementEntry.Name}));\n");
+                }
+                if(!ViewHolderCheckbox.IsChecked.Value)
+                    OutputBox.Text = (RegionCheckBox.IsChecked.Value ? "#region Views\n\n" : "") + outputFields + "\n" + outputProperties + (RegionCheckBox.IsChecked.Value ? "#endregion" : "");
+                else
+                {
+                    OutputBox.Text = @"        
+class &&NAME&&
+{
+    private readonly View _view;
+
+    public &&NAME&&(View view)
+    {
+        _view = view;
+    }
+" + outputFields + "\n" + outputProperties.Replace("FindViewById","_view.FindViewById") 
++ "}";
+                }
             }
-
-            OutputBox.Text = outputFields + "\n" + outputProperties;
-
+            catch (Exception e)
+            {
+                OutputBox.Text = $"{e}\n\n{e.Message}\n\n{e.StackTrace}";
+            }
         }
 
         private IEnumerable<XElement> GetNodesWithId(XElement rootElement)
