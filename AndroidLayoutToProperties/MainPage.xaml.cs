@@ -54,16 +54,17 @@ namespace AndroidLayoutToProperties
                 else
                 {
                     OutputBox.Text = @"        
-class &&NAME&&
+class NAME
 {
-    private readonly View _view;
+" + "\tprivate readonly View _view;" + @"        
 
-    public &&NAME&&(View view)
-    {
-        _view = view;
-    }
-" + outputFields + "\n" + outputProperties.Replace("FindViewById","_view.FindViewById") 
-+ "}";
+" + "\tpublic NAME(View view)" + @"      
+" + "\t{" + @"
+" + "\t\t_view = view;" + @"         
+" + "\t}" + @"
+
+    " + "\t" + outputFields.Replace("\n","\n\t") + "\n\t" + outputProperties.Replace("FindViewById","_view.FindViewById").Replace("\n", "\n\t").ToString().Trim()
+    + "\n}";
                 }
             }
             catch (Exception e)
