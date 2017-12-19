@@ -5,9 +5,13 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.AccessCache;
+using Windows.Storage.Pickers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,19 +29,38 @@ namespace AndroidLayoutToProperties
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private StorageFolder _resolutionFolder;
+
         public MainPage()
         {
-            this.InitializeComponent();
+            this.InitializeComponent();  
+            Init();
         }
 
-        private void DoTheThing(object sender, RoutedEventArgs ee)
+
+        public async void Init()
         {
             try
             {
+                _resolutionFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("ResolutionFolder");
+                ResolutionPath.Text = _resolutionFolder.Path;
+            }
+            catch (Exception e)
+            {
 
+            }         
+        }
 
+        private async void DoTheThing(object sender, RoutedEventArgs ee)
+        {
+            try
+            {
                 var layout = XDocument.Parse(InputBox.Text);
-                var nodes = GetNodesWithId(layout.Root).Select(element => new ElementEntry(element));
+                IEnumerable<ElementEntry> nodes = null;
+                await Task.Run(() =>
+                {
+                    nodes = GetNodesWithId(layout.Root).Select(element => new ElementEntry(element));
+                });
 
                 var outputFields = new StringBuilder();
                 var outputProperties = new StringBuilder();
@@ -49,8 +72,9 @@ namespace AndroidLayoutToProperties
                     outputProperties.AppendLine(
                         $"public {elementEntry.Type} {FirstToUpper(elementEntry.Name)} => _{field} ?? (_{field} = FindViewById<{elementEntry.Type}>(Resource.Id.{elementEntry.Name}));\n");
                 }
-                if(!ViewHolderCheckbox.IsChecked.Value)
-                    OutputBox.Text = (RegionCheckBox.IsChecked.Value ? "#region Views\n\n" : "") + outputFields + "\n" + outputProperties + (RegionCheckBox.IsChecked.Value ? "#endregion" : "");
+                if (!ViewHolderCheckbox.IsChecked.Value)
+                    OutputBox.Text = (RegionCheckBox.IsChecked.Value ? "#region Views\n\n" : "") + outputFields + "\n" +
+                                     outputProperties + (RegionCheckBox.IsChecked.Value ? "#endregion" : "");
                 else
                 {
                     OutputBox.Text = @"        
@@ -63,8 +87,10 @@ class NAME
 " + "\t\t_view = view;" + @"         
 " + "\t}" + @"
 
-    " + "\t" + outputFields.Replace("\n","\n\t") + "\n\t" + outputProperties.Replace("FindViewById","_view.FindViewById").Replace("\n", "\n\t").ToString().Trim()
-    + "\n}";
+    " + "\t" + outputFields.Replace("\n", "\n\t") + "\n\t" + outputProperties
+                                         .Replace("FindViewById", "_view.FindViewById").Replace("\n", "\n\t").ToString()
+                                         .Trim()
+                                     + "\n}";
                 }
             }
             catch (Exception e)
@@ -88,14 +114,49 @@ class NAME
 
             if (rootElement.HasAttributes)
             {
-                var attr = rootElement.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "id");
-                if(attr != null)
+                if (rootElement.Name == "include")
                 {
-                    if(attr.Value.StartsWith("@+id/"))
-                        yield return rootElement;
+                    if (_resolutionFolder != null)
+                    {
+                        string xml = null;
+                        try
+                        {
+
+                            var file = _resolutionFolder.GetFileAsync(
+                                $"{rootElement.Attribute("layout").Value.Replace("@layout/", "")}.xml").AsTask().Result;
+                            using (var fs = file.OpenReadAsync().AsTask().Result)
+                            {
+                                using (var reader = new StreamReader(fs.AsStreamForRead()))
+                                {
+                                    xml = reader.ReadToEnd();
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            //trolololololo
+                        }
+                        if (xml != null)
+                        {
+                            foreach (var element in GetNodesWithId(XDocument.Parse(xml).Root))
+                            {
+                                yield return element;
+                            }
+                        }
+                    }
                 }
+                else
+                {
+                    var attr = rootElement.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "id");
+                    if (attr != null)
+                    {
+                        if (attr.Value.StartsWith("@+id/"))
+                            yield return rootElement;
+                    }
+                }
+ 
             }
-            
+
         }
 
         private string FirstToLower(string input)
@@ -106,6 +167,24 @@ class NAME
         private string FirstToUpper(string input)
         {
             return input.Substring(0, 1).ToUpper() + input.Substring(1);
+        }
+
+        private async void SelectFolderOnClick(object sender, RoutedEventArgs e)
+        {
+            var folderPicker = new FolderPicker();
+            folderPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            folderPicker.FileTypeFilter.Add("*");
+
+            StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                StorageApplicationPermissions.FutureAccessList.AddOrReplace(
+                    "ResolutionFolder", folder);
+                _resolutionFolder = folder;
+                ResolutionPath.Text = folder.Path;
+            }
+
+
         }
     }
 

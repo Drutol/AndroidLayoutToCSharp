@@ -38,6 +38,10 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,5">
             <CheckBox x:Name="ViewHolderCheckbox" Content="ViewHolder"/>
             <CheckBox x:Name="RegionCheckBox" IsChecked="True" Content="Region"/>
+            <TextBox x:Name="ResolutionPath" IsReadOnly="True" PlaceholderText="Include resolution path" Width="600"/>
+            <Button Click="SelectFolderOnClick">
+                <SymbolIcon Symbol="Folder"/>
+            </Button>
         </StackPanel>
         <Button Grid.Row="2" Content="Do stuff!" HorizontalAlignment="Stretch" Margin="20" Click="DoTheThing"/>
         
