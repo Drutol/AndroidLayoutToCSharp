@@ -65,6 +65,9 @@ namespace AndroidLayoutToProperties
                 var outputFields = new StringBuilder();
                 var outputProperties = new StringBuilder();
 
+                if (OnlyUppercaseCheckBox.IsChecked == true)
+                    nodes = nodes.Where(entry => char.IsUpper(entry.Name[0]));
+
                 foreach (var elementEntry in nodes)
                 {
                     var field = FirstToLower(elementEntry.Name);
@@ -78,11 +81,11 @@ namespace AndroidLayoutToProperties
                 else
                 {
                     OutputBox.Text = @"        
-class NAME
+class NAME : RecyclerView.ViewHolder
 {
 " + "\tprivate readonly View _view;" + @"        
 
-" + "\tpublic NAME(View view)" + @"      
+" + "\tpublic NAME(View view) : base(view)" + @"      
 " + "\t{" + @"
 " + "\t\t_view = view;" + @"         
 " + "\t}" + @"
