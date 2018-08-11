@@ -12,6 +12,7 @@ using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -34,21 +35,23 @@ namespace AndroidLayoutToProperties
         public MainPage()
         {
             this.InitializeComponent();  
-            Init();
+            Loaded += OnLoaded;
         }
 
-
-        public async void Init()
+        private async void OnLoaded(object sender, RoutedEventArgs e)
         {
+            AddNewLinesBetweenProperties.IsChecked =
+                (bool) ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"];
+
             try
             {
                 _resolutionFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("ResolutionFolder");
                 ResolutionPath.Text = _resolutionFolder.Path;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
-            }         
+                //shrug
+            }
         }
 
         private async void DoTheThing(object sender, RoutedEventArgs ee)
@@ -62,6 +65,18 @@ namespace AndroidLayoutToProperties
                     nodes = GetNodesWithId(layout.Root).Select(element => new ElementEntry(element));
                 });
 
+                var groups = nodes.GroupBy(entry => entry.Name);
+                if (groups.Any(entries => entries.Count() > 1))
+                {
+                    var dialog = new MessageDialog("Multiple controls referenced with the same ID found: " +
+                                                   $"{string.Join(",", groups.Where(entries => entries.Count() > 1).Select(entries => entries.Key))}\n\n",
+                        "Duplicate IDs!");
+                    await dialog.ShowAsync();
+
+                    var newNodes = groups.Select(g => g.Take(1).First()).ToList();
+                    nodes = newNodes;
+                }
+
                 var outputFields = new StringBuilder();
                 var outputProperties = new StringBuilder();
 
@@ -73,28 +88,39 @@ namespace AndroidLayoutToProperties
                     var field = FirstToLower(elementEntry.Name);
                     outputFields.AppendLine($"private {elementEntry.Type} _{field};");
                     outputProperties.AppendLine(
-                        $"public {elementEntry.Type} {FirstToUpper(elementEntry.Name)} => _{field} ?? (_{field} = FindViewById<{elementEntry.Type}>(Resource.Id.{elementEntry.Name}));\n");
+                        $"public {elementEntry.Type} {FirstToUpper(elementEntry.Name)} => _{field} ?? (_{field} = FindViewById<{elementEntry.Type}>(Resource.Id.{elementEntry.Name}));{(AddNewLinesBetweenProperties.IsChecked == true ? "\n" : "")}");
                 }
-                if (!ViewHolderCheckbox.IsChecked.Value)
-                    OutputBox.Text = (RegionCheckBox.IsChecked.Value ? "#region Views\n\n" : "") + outputFields + "\n" +
-                                     outputProperties + (RegionCheckBox.IsChecked.Value ? "#endregion" : "");
+
+                if (!ViewHolderCheckbox.IsChecked == true)
+                {
+                    var builder = new StringBuilder();
+                    if (RegionCheckBox.IsChecked == true)
+                        builder.AppendLine("#region Views\n");
+                    builder.AppendLine(outputFields.ToString());
+                    builder.AppendLine(outputProperties.ToString().Trim());
+                    if (RegionCheckBox.IsChecked == true)
+                        builder.Append("\n#endregion");
+
+                    OutputBox.Text = builder.ToString();
+                }
                 else
                 {
-                    OutputBox.Text = @"        
-class NAME : RecyclerView.ViewHolder
-{
-" + "\tprivate readonly View _view;" + @"        
+                    var builder = new StringBuilder();
+                    builder.AppendLine("class NAME : RecyclerView.ViewHolder");
+                    builder.AppendLine("{");
+                    builder.AppendLine("\tprivate readonly View _view;");
+                    builder.AppendLine("");
+                    builder.AppendLine("\tpublic NAME(View view) : base(view)");
+                    builder.AppendLine("\t{");
+                    builder.AppendLine("\t\t_view = view;");
+                    builder.AppendLine("\t}");
+                    builder.AppendLine($"\t{outputFields.Replace("\n", "\n\t")}");
+                    builder.AppendLine("\t" + outputProperties.Replace("FindViewById", "_view.FindViewById").Replace("\n", "\n\t")
+                        .ToString().Trim());
+                    builder.AppendLine("}");
 
-" + "\tpublic NAME(View view) : base(view)" + @"      
-" + "\t{" + @"
-" + "\t\t_view = view;" + @"         
-" + "\t}" + @"
-
-    " + "\t" + outputFields.Replace("\n", "\n\t") + "\n\t" + outputProperties
-                                         .Replace("FindViewById", "_view.FindViewById").Replace("\n", "\n\t").ToString()
-                                         .Trim()
-                                     + "\n}";
-                }
+                    OutputBox.Text = builder.ToString();
+               }
             }
             catch (Exception e)
             {
@@ -137,7 +163,7 @@ class NAME : RecyclerView.ViewHolder
                         }
                         catch
                         {
-                            //trolololololo
+                            //filesystem may troll us here
                         }
                         if (xml != null)
                         {
@@ -186,8 +212,11 @@ class NAME : RecyclerView.ViewHolder
                 _resolutionFolder = folder;
                 ResolutionPath.Text = folder.Path;
             }
+        }
 
-
+        private void AddNewLinesBetweenPropertiesOnChecked(object sender, RoutedEventArgs e)
+        {
+            ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"] = AddNewLinesBetweenProperties.IsChecked.Value;
         }
     }
 
@@ -198,7 +227,11 @@ class NAME : RecyclerView.ViewHolder
 
         public ElementEntry(XElement source)
         {
-            Type = source.Name.LocalName.Split('.').Last();
+            var attr = source.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "managedTypeName");
+            Type = attr != null ? 
+                attr.Value : 
+                source.Name.LocalName.Split('.').Last();
+       
             Name = source.Attributes().First(attribute => attribute.Name.LocalName == "id").Value.Substring(5);
         }
     }

@@ -7,44 +7,77 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{ThemeResource SystemControlAcrylicWindowBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Margin="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Input" FontSize="20" HorizontalAlignment="Center"/>
-                <TextBox Grid.Row="1" x:Name="InputBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" AcceptsReturn="True"/>
-            </Grid>            
+                <TextBlock Text="Input" FontSize="20" HorizontalAlignment="Center" />
+                <TextBox Grid.Row="1" x:Name="InputBox" HorizontalAlignment="Stretch" IsSpellCheckEnabled="False" VerticalAlignment="Stretch"
+                         Margin="10" AcceptsReturn="True" />
+            </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Output" FontSize="20" HorizontalAlignment="Center"/>
-                <TextBox Grid.Row="1" x:Name="OutputBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" AcceptsReturn="True"/>
+                <TextBlock Text="Output" FontSize="20" HorizontalAlignment="Center" />
+                <TextBox Grid.Row="1" x:Name="OutputBox" HorizontalAlignment="Stretch" IsSpellCheckEnabled="False" VerticalAlignment="Stretch"
+                         Margin="10" AcceptsReturn="True" />
             </Grid>
         </Grid>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,5">
-            <CheckBox x:Name="ViewHolderCheckbox" Content="ViewHolder"/>
-            <CheckBox x:Name="RegionCheckBox" IsChecked="True" Content="Region"/>
-            <CheckBox x:Name="OnlyUppercaseCheckBox" IsChecked="True" Content="OnlyUppercase"/>
-            <TextBox x:Name="ResolutionPath" IsReadOnly="True" PlaceholderText="Include resolution path" Width="600" Margin="20,0,0,0"/>
-            <Button Click="SelectFolderOnClick">
-                <SymbolIcon Symbol="Folder"/>
-            </Button>
-        </StackPanel>
-        <Button Grid.Row="2" Content="Do stuff!" HorizontalAlignment="Stretch" Margin="20" Click="DoTheThing"/>
-        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <StackPanel  Orientation="Horizontal" Margin="20,5" Height="32">
+                    <CheckBox x:Name="ViewHolderCheckbox" Content="ViewHolder" />
+                    <CheckBox x:Name="RegionCheckBox" IsChecked="True" Content="Add Region" />
+                    <CheckBox x:Name="OnlyUppercaseCheckBox" IsChecked="True" Content="OnlyUppercase"  />
+                    <CheckBox x:Name="AddNewLinesBetweenProperties" IsChecked="True" Content="Newlines between properties"
+                              Margin="14,0,0,0" Click="AddNewLinesBetweenPropertiesOnChecked" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox x:Name="ResolutionPath" IsReadOnly="True" PlaceholderText="Include resolution path" Width="600"
+                             Margin="20,0,0,0" />
+                    <Button Click="SelectFolderOnClick">
+                        <SymbolIcon Symbol="Folder" />
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Column="1" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush}" Width="40" Height="40" Margin="0,0,20,0">
+                <ToolTipService.ToolTip>
+                    <ToolTip>
+                        <ItemsControl>
+                            <TextBlock FontSize="16" TextWrapping="WrapWholeWords">
+                                • add "tools:managedTypeName" to override Type found in XML
+                            </TextBlock>
+                            <MenuFlyoutSeparator/>
+                            <TextBlock FontSize="16" TextWrapping="WrapWholeWords">
+                                • provide path to Resources/Layout folder to allow searching for controls referenced in xml includes
+                            </TextBlock>
+                        </ItemsControl>
+                    </ToolTip>
+                </ToolTipService.ToolTip>
+                <SymbolIcon Symbol="Help"/>
+            </Grid>
+        </Grid>
+
+        <Button Grid.Row="2" Content="Do stuff!" HorizontalAlignment="Stretch" Margin="20" Click="DoTheThing" />
+
     </Grid>
 </Page>
