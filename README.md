@@ -3,7 +3,7 @@
 Tiny prgram that converts android xml's into c# properties. It can save a few minutes of your life ^^
 It runs on UWP.
 
-![](https://github.com/Drutol/AndroidLayoutToCSharp/blob/master/github/screenshot.png)
+![](https://raw.githubusercontent.com/Drutol/AndroidLayoutToCSharp/master/github/screenshot.png)
 
 ## Features
 
