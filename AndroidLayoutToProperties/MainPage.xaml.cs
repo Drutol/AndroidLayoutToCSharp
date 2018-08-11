@@ -204,7 +204,7 @@ namespace AndroidLayoutToProperties
             folderPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
             folderPicker.FileTypeFilter.Add("*");
 
-            StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+            var folder = await folderPicker.PickSingleFolderAsync();
             if (folder != null)
             {
                 StorageApplicationPermissions.FutureAccessList.AddOrReplace(
