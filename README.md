@@ -1,6 +1,7 @@
 # AndroidLayoutToCSharp
 
-Tiny prgram that converts android xml's into c# properties. It can save a few minutes of your life ^^
+Tiny program that converts Android XML's into C# properties. It can save a few minutes of your life ^^
+
 It runs on UWP.
 
 ![](https://raw.githubusercontent.com/Drutol/AndroidLayoutToCSharp/master/github/screenshot.png)
