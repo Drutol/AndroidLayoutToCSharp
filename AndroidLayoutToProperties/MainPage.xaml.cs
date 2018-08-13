@@ -40,24 +40,16 @@ namespace AndroidLayoutToProperties
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            try
+            var settings = ApplicationData.Current.LocalSettings.Values;
+            if (settings.ContainsKey("AddNewLinesBetweenProperties"))
             {
-                AddNewLinesBetweenProperties.IsChecked =
-                    (bool)ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"];
-            }
-            catch (Exception exception)
-            {
-                // ¯\_(ツ)_/¯
+                AddNewLinesBetweenProperties.IsChecked = (bool) settings["AddNewLinesBetweenProperties"];
             }
 
-            try
+            if (StorageApplicationPermissions.FutureAccessList.ContainsItem("ResolutionFolder"))
             {
                 _resolutionFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("ResolutionFolder");
                 ResolutionPath.Text = _resolutionFolder.Path;
-            }
-            catch (Exception)
-            {
-                //shrug
             }
         }
 
