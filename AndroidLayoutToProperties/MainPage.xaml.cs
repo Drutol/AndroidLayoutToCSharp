@@ -40,8 +40,15 @@ namespace AndroidLayoutToProperties
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            AddNewLinesBetweenProperties.IsChecked =
-                (bool) ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"];
+            try
+            {
+                AddNewLinesBetweenProperties.IsChecked =
+                    (bool)ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"];
+            }
+            catch (Exception exception)
+            {
+                // ¯\_(ツ)_/¯
+            }
 
             try
             {
