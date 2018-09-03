@@ -142,45 +142,77 @@ namespace AndroidLayoutToProperties
 
             if (rootElement.HasAttributes)
             {
+                var attr = rootElement.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "id");
+
                 if (rootElement.Name == "include")
                 {
-                    if (_resolutionFolder != null)
+                    var skipRecursiveResolutionAttr = rootElement.Attributes()
+                        .FirstOrDefault(attribute => attribute.Name.LocalName == "skipRecursion");
+                    if (skipRecursiveResolutionAttr == null || skipRecursiveResolutionAttr.Value == "false")
                     {
-                        string xml = null;
-                        try
+                        if (_resolutionFolder != null)
                         {
+                            var addPrefixAttr = rootElement.Attributes()
+                                .FirstOrDefault(attribute => attribute.Name.LocalName == "innerPrefix");
 
-                            var file = _resolutionFolder.GetFileAsync(
-                                $"{rootElement.Attribute("layout").Value.Replace("@layout/", "")}.xml").AsTask().Result;
-                            using (var fs = file.OpenReadAsync().AsTask().Result)
+                            string xml = null;
+                            try
                             {
-                                using (var reader = new StreamReader(fs.AsStreamForRead()))
+
+                                var file = _resolutionFolder.GetFileAsync(
+                                        $"{rootElement.Attribute("layout").Value.Replace("@layout/", "")}.xml").AsTask()
+                                    .Result;
+                                using (var fs = file.OpenReadAsync().AsTask().Result)
                                 {
-                                    xml = reader.ReadToEnd();
+                                    using (var reader = new StreamReader(fs.AsStreamForRead()))
+                                    {
+                                        xml = reader.ReadToEnd();
+                                    }
                                 }
                             }
-                        }
-                        catch
-                        {
-                            //filesystem may troll us here
-                        }
-                        if (xml != null)
-                        {
-                            foreach (var element in GetNodesWithId(XDocument.Parse(xml).Root))
+                            catch
                             {
-                                yield return element;
+                                //filesystem may troll us here
+                            }
+
+                            if (xml != null)
+                            {
+                                foreach (var element in GetNodesWithId(XDocument.Parse(xml).Root))
+                                {
+                                    if (addPrefixAttr != null)
+                                    {
+                                        var idAttr = element.Attributes()
+                                            .FirstOrDefault(attribute => attribute.Name.LocalName == "id");
+
+                                        idAttr.Value = "@+id/" + (addPrefixAttr.Value == "default"
+                                            ? $"{idAttr.Value.Substring(5)}_"
+                                            : addPrefixAttr.Value) + idAttr.Value.Substring(5);
+                                    }
+
+                                    yield return element;
+                                }
                             }
                         }
                     }
                 }
-                else
+
+                
+                if (attr != null)
                 {
-                    var attr = rootElement.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "id");
-                    if (attr != null)
+                    if (rootElement.Name == "include")
+                    {
+                        if (rootElement.Attributes().Any(attribute => attribute.Name.LocalName == "managedTypeName"))
+                        {
+                            if (attr.Value.StartsWith("@+id/"))
+                                yield return rootElement;
+                        }
+                    }
+                    else
                     {
                         if (attr.Value.StartsWith("@+id/"))
                             yield return rootElement;
                     }
+
                 }
  
             }
