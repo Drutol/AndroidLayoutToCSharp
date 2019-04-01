@@ -61,14 +61,18 @@
 
             <Grid Grid.Column="1" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush}" Width="40" Height="40" Margin="0,0,20,0">
                 <ToolTipService.ToolTip>
-                    <ToolTip>
+                    <ToolTip >
                         <ItemsControl>
-                            <TextBlock FontSize="16" TextWrapping="WrapWholeWords">
+                            <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
                                 • add "tools:managedTypeName" to override Type found in XML
                             </TextBlock>
                             <MenuFlyoutSeparator/>
-                            <TextBlock FontSize="16" TextWrapping="WrapWholeWords">
+                            <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
                                 • provide path to Resources/Layout folder to allow searching for controls referenced in xml includes
+                            </TextBlock>    
+                            <MenuFlyoutSeparator/>
+                            <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
+                                • add "tools:skipRecursion" to disable recursive resolution of included layouts 
                             </TextBlock>
                         </ItemsControl>
                     </ToolTip>

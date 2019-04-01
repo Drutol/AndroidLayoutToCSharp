@@ -158,17 +158,7 @@ namespace AndroidLayoutToProperties
                             string xml = null;
                             try
                             {
-
-                                var file = _resolutionFolder.GetFileAsync(
-                                        $"{rootElement.Attribute("layout").Value.Replace("@layout/", "")}.xml").AsTask()
-                                    .Result;
-                                using (var fs = file.OpenReadAsync().AsTask().Result)
-                                {
-                                    using (var reader = new StreamReader(fs.AsStreamForRead()))
-                                    {
-                                        xml = reader.ReadToEnd();
-                                    }
-                                }
+                                xml = GetIncludedLayout(rootElement);
                             }
                             catch
                             {
@@ -206,6 +196,31 @@ namespace AndroidLayoutToProperties
                             if (attr.Value.StartsWith("@+id/"))
                                 yield return rootElement;
                         }
+                        else if (_resolutionFolder != null)
+                        {
+                            //let's try to get the root element class name from the file
+                            string xml = null;
+                            try
+                            {
+                                xml = GetIncludedLayout(rootElement);
+                            }
+                            catch
+                            {
+                                //no dice
+                            }
+
+                            if (xml != null)
+                            {
+                                var doc = XDocument.Parse(xml);
+                                if (doc.Root != null)
+                                {
+                                    rootElement.SetAttributeValue("managedTypeName", doc.Root.Name.LocalName);
+                                    yield return rootElement;
+                                }
+                            }
+
+
+                        }
                     }
                     else
                     {
@@ -217,6 +232,27 @@ namespace AndroidLayoutToProperties
  
             }
 
+        }
+
+        private string GetIncludedLayout(XElement includeElement)
+        {
+            if (includeElement.Attributes().All(attribute => attribute.Name != "layout"))
+                return null;
+
+            string xml;
+            var file = _resolutionFolder.GetFileAsync(
+                    // ReSharper disable once PossibleNullReferenceException
+                    $"{includeElement.Attribute("layout").Value.Replace("@layout/", "")}.xml").AsTask()
+                .Result;
+            using (var fs = file.OpenReadAsync().AsTask().Result)
+            {
+                using (var reader = new StreamReader(fs.AsStreamForRead()))
+                {
+                    xml = reader.ReadToEnd();
+                }
+            }
+
+            return xml;
         }
 
         private string FirstToLower(string input)
