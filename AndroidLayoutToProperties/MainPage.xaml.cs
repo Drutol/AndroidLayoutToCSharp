@@ -20,6 +20,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Newtonsoft.Json;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -30,6 +31,8 @@ namespace AndroidLayoutToProperties
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private List<RecentFolderResolutionEntry> _recentResolutionFolders;
+
         private StorageFolder _resolutionFolder;
 
         public MainPage()
@@ -41,6 +44,20 @@ namespace AndroidLayoutToProperties
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             var settings = ApplicationData.Current.LocalSettings.Values;
+            //settings.Remove("RecentResolutionFolders");
+            if (settings.ContainsKey("RecentResolutionFolders"))
+            {
+                _recentResolutionFolders =
+                    JsonConvert.DeserializeObject<List<RecentFolderResolutionEntry>>(settings["RecentResolutionFolders"]
+                        .ToString());
+            }
+            else
+            {
+                _recentResolutionFolders = new List<RecentFolderResolutionEntry>();
+            }
+
+            RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
+
             if (settings.ContainsKey("AddNewLinesBetweenProperties"))
             {
                 AddNewLinesBetweenProperties.IsChecked = (bool) settings["AddNewLinesBetweenProperties"];
@@ -112,14 +129,14 @@ namespace AndroidLayoutToProperties
                     builder.AppendLine("\tpublic NAME(View view) : base(view)");
                     builder.AppendLine("\t{");
                     builder.AppendLine("\t\t_view = view;");
-                    builder.AppendLine("\t}");
+                    builder.AppendLine("\t}\n");
                     builder.AppendLine($"\t{outputFields.Replace("\n", "\n\t")}");
                     builder.AppendLine("\t" + outputProperties.Replace("FindViewById", "_view.FindViewById").Replace("\n", "\n\t")
                         .ToString().Trim());
                     builder.AppendLine("}");
 
                     OutputBox.Text = builder.ToString();
-               }
+                }
             }
             catch (Exception e)
             {
@@ -265,7 +282,7 @@ namespace AndroidLayoutToProperties
             return input.Substring(0, 1).ToUpper() + input.Substring(1);
         }
 
-        private async void SelectFolderOnClick(object sender, RoutedEventArgs e)
+        private async void SelectFolderOnClick(object sender, RoutedEventArgs ev)
         {
             var folderPicker = new FolderPicker();
             folderPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
@@ -278,6 +295,29 @@ namespace AndroidLayoutToProperties
                     "ResolutionFolder", folder);
                 _resolutionFolder = folder;
                 ResolutionPath.Text = folder.Path;
+
+                if(_recentResolutionFolders.Any(e => e.Path == folder.Path))
+                    return;
+
+                var guid = Guid.NewGuid();
+                _recentResolutionFolders.Insert(0, new RecentFolderResolutionEntry
+                {
+                    Guid = guid,
+                    Path = folder.Path
+                });
+                StorageApplicationPermissions.FutureAccessList.AddOrReplace(guid.ToString(), folder);
+
+                if (_recentResolutionFolders.Count > 10)
+                {
+                    var last = _recentResolutionFolders.Last();
+                    _recentResolutionFolders.Remove(last);
+                    StorageApplicationPermissions.FutureAccessList.Remove(last.Guid.ToString());
+                }
+
+                ApplicationData.Current.LocalSettings.Values["RecentResolutionFolders"] =
+                    JsonConvert.SerializeObject(_recentResolutionFolders);
+
+                RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
             }
         }
 
@@ -285,6 +325,44 @@ namespace AndroidLayoutToProperties
         {
             ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"] = AddNewLinesBetweenProperties.IsChecked.Value;
         }
+
+        private async void RecentResolutionFoldersListOnItemClick(object sender, ItemClickEventArgs e)
+        {
+            var selectedItem = (RecentFolderResolutionEntry)e.ClickedItem;
+            var index = _recentResolutionFolders.IndexOf(selectedItem);
+            _recentResolutionFolders.RemoveAt(index);
+            _recentResolutionFolders.Insert(0, selectedItem);
+
+           var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(selectedItem.Guid.ToString());
+            _resolutionFolder = folder;
+            ResolutionPath.Text = folder.Path;
+
+
+            ApplicationData.Current.LocalSettings.Values["RecentResolutionFolders"] =
+                JsonConvert.SerializeObject(_recentResolutionFolders);
+
+            RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
+        }
+
+        private void RemoveRecentResolutionFolderOnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (RecentFolderResolutionEntry)(sender as Button).CommandParameter;
+            var index = _recentResolutionFolders.IndexOf(selectedItem);
+            _recentResolutionFolders.RemoveAt(index);
+
+            StorageApplicationPermissions.FutureAccessList.Remove(selectedItem.Guid.ToString());
+            ApplicationData.Current.LocalSettings.Values["RecentResolutionFolders"] =
+                JsonConvert.SerializeObject(_recentResolutionFolders);
+
+            RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
+        }
+
+    }
+
+    public class RecentFolderResolutionEntry
+    {
+        public Guid Guid { get; set; }
+        public string Path { get; set; }
     }
 
     public class ElementEntry

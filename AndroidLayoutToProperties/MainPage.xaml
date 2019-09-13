@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:AndroidLayoutToProperties"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    x:Name="Self"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
@@ -55,24 +56,60 @@
                              Margin="20,0,0,0" />
                     <Button Click="SelectFolderOnClick">
                         <SymbolIcon Symbol="Folder" />
+                    </Button>    
+                    <Button>
+                        <Button.Flyout>
+                            <Flyout>
+                                <Flyout.FlyoutPresenterStyle>
+                                    <Style TargetType="FlyoutPresenter">
+                                        <Setter Property="MaxWidth" Value="{Binding ElementName=Self, Path=ActualWidth}"/>
+                                    </Style>
+                                </Flyout.FlyoutPresenterStyle>
+                                <ListView x:Name="RecentResolutionFoldersList" IsItemClickEnabled="True" ItemClick="RecentResolutionFoldersListOnItemClick">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Path}" VerticalAlignment="Center"/>
+                                                <Button Grid.Column="1" Margin="16,0,0,0" CommandParameter="{Binding}"
+                                                        Click="RemoveRecentResolutionFolderOnClick">
+                                                    <SymbolIcon Symbol="Delete"/>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Flyout>
+                        </Button.Flyout>
+                        <SymbolIcon Symbol="SyncFolder"/>
                     </Button>
                 </StackPanel>
             </StackPanel>
 
             <Grid Grid.Column="1" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush}" Width="40" Height="40" Margin="0,0,20,0">
                 <ToolTipService.ToolTip>
-                    <ToolTip >
+                    <ToolTip>
                         <ItemsControl>
                             <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
-                                • add "tools:managedTypeName" to override Type found in XML
+                                <Run Text="• add &quot;tools:managedTypeName&quot; to override Type found in XML"/>
                             </TextBlock>
                             <MenuFlyoutSeparator/>
                             <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
-                                • provide path to Resources/Layout folder to allow searching for controls referenced in xml includes
+                                <Run Text="• provide path to Resources/Layout folder to allow searching for controls referenced in xml includes"/>
+
                             </TextBlock>    
                             <MenuFlyoutSeparator/>
                             <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
-                                • add "tools:skipRecursion" to disable recursive resolution of included layouts 
+                                <Run Text="• add &quot;tools:skipRecursion&quot; to disable recursive resolution of included layouts "/>
+
                             </TextBlock>
                         </ItemsControl>
                     </ToolTip>
