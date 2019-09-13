@@ -333,7 +333,8 @@ namespace AndroidLayoutToProperties
             _recentResolutionFolders.RemoveAt(index);
             _recentResolutionFolders.Insert(0, selectedItem);
 
-           var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(selectedItem.Guid.ToString());
+            var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(selectedItem.Guid.ToString());
+            StorageApplicationPermissions.FutureAccessList.AddOrReplace("ResolutionFolder", folder);
             _resolutionFolder = folder;
             ResolutionPath.Text = folder.Path;
 
@@ -356,7 +357,6 @@ namespace AndroidLayoutToProperties
 
             RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
         }
-
     }
 
     public class RecentFolderResolutionEntry
