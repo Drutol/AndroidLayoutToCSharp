@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidLayoutToProperties", "AndroidLayoutToProperties\AndroidLayoutToProperties.csproj", "{178F19E0-8577-4840-86A2-739337D9268A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidLayoutToCSharp.Console", "AndroidLayoutToCSharp.Console\AndroidLayoutToCSharp.Console.csproj", "{F0B8691E-6447-4704-B42F-79BEC66449C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -33,6 +35,18 @@ Global
 		{178F19E0-8577-4840-86A2-739337D9268A}.Release|x86.ActiveCfg = Release|x86
 		{178F19E0-8577-4840-86A2-739337D9268A}.Release|x86.Build.0 = Release|x86
 		{178F19E0-8577-4840-86A2-739337D9268A}.Release|x86.Deploy.0 = Release|x86
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Debug|x64.Build.0 = Debug|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Debug|x86.Build.0 = Debug|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Release|ARM.Build.0 = Release|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Release|x64.ActiveCfg = Release|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Release|x64.Build.0 = Release|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Release|x86.ActiveCfg = Release|Any CPU
+		{F0B8691E-6447-4704-B42F-79BEC66449C6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

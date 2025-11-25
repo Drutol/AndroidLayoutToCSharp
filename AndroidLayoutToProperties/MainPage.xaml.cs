@@ -1,33 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage;
-using Windows.Storage.AccessCache;
-using Windows.Storage.Pickers;
-using Windows.UI.Popups;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Newtonsoft.Json;
+﻿
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace AndroidLayoutToProperties
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    ///     An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
@@ -37,7 +15,7 @@ namespace AndroidLayoutToProperties
 
         public MainPage()
         {
-            this.InitializeComponent();  
+            InitializeComponent();
             Loaded += OnLoaded;
         }
 
@@ -46,26 +24,21 @@ namespace AndroidLayoutToProperties
             var settings = ApplicationData.Current.LocalSettings.Values;
             //settings.Remove("RecentResolutionFolders");
             if (settings.ContainsKey("RecentResolutionFolders"))
-            {
                 _recentResolutionFolders =
                     JsonConvert.DeserializeObject<List<RecentFolderResolutionEntry>>(settings["RecentResolutionFolders"]
                         .ToString());
-            }
             else
-            {
                 _recentResolutionFolders = new List<RecentFolderResolutionEntry>();
-            }
 
             RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
 
             if (settings.ContainsKey("AddNewLinesBetweenProperties"))
-            {
-                AddNewLinesBetweenProperties.IsChecked = (bool) settings["AddNewLinesBetweenProperties"];
-            }
+                AddNewLinesBetweenProperties.IsChecked = (bool)settings["AddNewLinesBetweenProperties"];
 
             if (StorageApplicationPermissions.FutureAccessList.ContainsItem("ResolutionFolder"))
             {
-                _resolutionFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("ResolutionFolder");
+                _resolutionFolder =
+                    await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("ResolutionFolder");
                 ResolutionPath.Text = _resolutionFolder.Path;
             }
         }
@@ -131,7 +104,8 @@ namespace AndroidLayoutToProperties
                     builder.AppendLine("\t\t_view = view;");
                     builder.AppendLine("\t}\n");
                     builder.AppendLine($"\t{outputFields.Replace("\n", "\n\t")}");
-                    builder.AppendLine("\t" + outputProperties.Replace("FindViewById", "_view.FindViewById").Replace("\n", "\n\t")
+                    builder.AppendLine("\t" + outputProperties.Replace("FindViewById", "_view.FindViewById")
+                        .Replace("\n", "\n\t")
                         .ToString().Trim());
                     builder.AppendLine("}");
 
@@ -147,15 +121,9 @@ namespace AndroidLayoutToProperties
         private IEnumerable<XElement> GetNodesWithId(XElement rootElement)
         {
             if (rootElement.HasElements)
-            {
                 foreach (var xElement in rootElement.Elements())
-                {
-                    foreach (var element in GetNodesWithId(xElement))
-                    {
-                        yield return element;
-                    }
-                }
-            }
+                foreach (var element in GetNodesWithId(xElement))
+                    yield return element;
 
             if (rootElement.HasAttributes)
             {
@@ -166,7 +134,6 @@ namespace AndroidLayoutToProperties
                     var skipRecursiveResolutionAttr = rootElement.Attributes()
                         .FirstOrDefault(attribute => attribute.Name.LocalName == "skipRecursion");
                     if (skipRecursiveResolutionAttr == null || skipRecursiveResolutionAttr.Value == "false")
-                    {
                         if (_resolutionFolder != null)
                         {
                             var addPrefixAttr = rootElement.Attributes()
@@ -183,7 +150,6 @@ namespace AndroidLayoutToProperties
                             }
 
                             if (xml != null)
-                            {
                                 foreach (var element in GetNodesWithId(XDocument.Parse(xml).Root))
                                 {
                                     if (addPrefixAttr != null)
@@ -198,12 +164,10 @@ namespace AndroidLayoutToProperties
 
                                     yield return element;
                                 }
-                            }
                         }
-                    }
                 }
 
-                
+
                 if (attr != null)
                 {
                     if (rootElement.Name == "include")
@@ -235,8 +199,6 @@ namespace AndroidLayoutToProperties
                                     yield return rootElement;
                                 }
                             }
-
-
                         }
                     }
                     else
@@ -244,11 +206,8 @@ namespace AndroidLayoutToProperties
                         if (attr.Value.StartsWith("@+id/"))
                             yield return rootElement;
                     }
-
                 }
- 
             }
-
         }
 
         private string GetIncludedLayout(XElement includeElement)
@@ -296,7 +255,7 @@ namespace AndroidLayoutToProperties
                 _resolutionFolder = folder;
                 ResolutionPath.Text = folder.Path;
 
-                if(_recentResolutionFolders.Any(e => e.Path == folder.Path))
+                if (_recentResolutionFolders.Any(e => e.Path == folder.Path))
                     return;
 
                 var guid = Guid.NewGuid();
@@ -317,13 +276,15 @@ namespace AndroidLayoutToProperties
                 ApplicationData.Current.LocalSettings.Values["RecentResolutionFolders"] =
                     JsonConvert.SerializeObject(_recentResolutionFolders);
 
-                RecentResolutionFoldersList.ItemsSource = new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
+                RecentResolutionFoldersList.ItemsSource =
+                    new List<RecentFolderResolutionEntry>(_recentResolutionFolders);
             }
         }
 
         private void AddNewLinesBetweenPropertiesOnChecked(object sender, RoutedEventArgs e)
         {
-            ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"] = AddNewLinesBetweenProperties.IsChecked.Value;
+            ApplicationData.Current.LocalSettings.Values["AddNewLinesBetweenProperties"] =
+                AddNewLinesBetweenProperties.IsChecked.Value;
         }
 
         private async void RecentResolutionFoldersListOnItemClick(object sender, ItemClickEventArgs e)
@@ -333,7 +294,8 @@ namespace AndroidLayoutToProperties
             _recentResolutionFolders.RemoveAt(index);
             _recentResolutionFolders.Insert(0, selectedItem);
 
-            var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(selectedItem.Guid.ToString());
+            var folder =
+                await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(selectedItem.Guid.ToString());
             StorageApplicationPermissions.FutureAccessList.AddOrReplace("ResolutionFolder", folder);
             _resolutionFolder = folder;
             ResolutionPath.Text = folder.Path;
@@ -367,17 +329,15 @@ namespace AndroidLayoutToProperties
 
     public class ElementEntry
     {
-        public string Type { get; set; }
-        public string Name { get; set; }
-
         public ElementEntry(XElement source)
         {
             var attr = source.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "managedTypeName");
-            Type = attr != null ? 
-                attr.Value : 
-                source.Name.LocalName.Split('.').Last();
-       
+            Type = attr != null ? attr.Value : source.Name.LocalName.Split('.').Last();
+
             Name = source.Attributes().First(attribute => attribute.Name.LocalName == "id").Value.Substring(5);
         }
+
+        public string Type { get; set; }
+        public string Name { get; set; }
     }
 }

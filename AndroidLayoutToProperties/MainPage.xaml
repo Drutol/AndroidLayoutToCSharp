@@ -2,7 +2,6 @@
     x:Class="AndroidLayoutToProperties.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:AndroidLayoutToProperties"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     x:Name="Self"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -25,7 +24,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Input" FontSize="20" HorizontalAlignment="Center" />
-                <TextBox Grid.Row="1" x:Name="InputBox" HorizontalAlignment="Stretch" IsSpellCheckEnabled="False" VerticalAlignment="Stretch"
+                <TextBox Grid.Row="1" x:Name="InputBox" HorizontalAlignment="Stretch" IsSpellCheckEnabled="False"
+                         VerticalAlignment="Stretch"
                          Margin="10" AcceptsReturn="True" />
             </Grid>
             <Grid Grid.Column="1">
@@ -34,54 +34,59 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Output" FontSize="20" HorizontalAlignment="Center" />
-                <TextBox Grid.Row="1" x:Name="OutputBox" HorizontalAlignment="Stretch" IsSpellCheckEnabled="False" VerticalAlignment="Stretch"
+                <TextBox Grid.Row="1" x:Name="OutputBox" HorizontalAlignment="Stretch" IsSpellCheckEnabled="False"
+                         VerticalAlignment="Stretch"
                          Margin="10" AcceptsReturn="True" />
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <StackPanel  Orientation="Horizontal" Margin="20,5" Height="32">
+                <StackPanel Orientation="Horizontal" Margin="20,5" Height="32">
                     <CheckBox x:Name="ViewHolderCheckbox" Content="ViewHolder" />
                     <CheckBox x:Name="RegionCheckBox" IsChecked="True" Content="Add Region" />
-                    <CheckBox x:Name="OnlyUppercaseCheckBox" IsChecked="True" Content="OnlyUppercase"  />
-                    <CheckBox x:Name="AddNewLinesBetweenProperties" IsChecked="True" Content="Newlines between properties"
+                    <CheckBox x:Name="OnlyUppercaseCheckBox" IsChecked="True" Content="OnlyUppercase" />
+                    <CheckBox x:Name="AddNewLinesBetweenProperties" IsChecked="True"
+                              Content="Newlines between properties"
                               Margin="14,0,0,0" Click="AddNewLinesBetweenPropertiesOnChecked" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBox x:Name="ResolutionPath" IsReadOnly="True" PlaceholderText="Include resolution path" Width="600"
+                    <TextBox x:Name="ResolutionPath" IsReadOnly="True" PlaceholderText="Include resolution path"
+                             Width="600"
                              Margin="20,0,0,0" />
                     <Button Click="SelectFolderOnClick">
                         <SymbolIcon Symbol="Folder" />
-                    </Button>    
+                    </Button>
                     <Button>
                         <Button.Flyout>
                             <Flyout>
                                 <Flyout.FlyoutPresenterStyle>
                                     <Style TargetType="FlyoutPresenter">
-                                        <Setter Property="MaxWidth" Value="{Binding ElementName=Self, Path=ActualWidth}"/>
+                                        <Setter Property="MaxWidth"
+                                                Value="{Binding ElementName=Self, Path=ActualWidth}" />
                                     </Style>
                                 </Flyout.FlyoutPresenterStyle>
-                                <ListView x:Name="RecentResolutionFoldersList" IsItemClickEnabled="True" ItemClick="RecentResolutionFoldersListOnItemClick">
+                                <ListView x:Name="RecentResolutionFoldersList" IsItemClickEnabled="True"
+                                          ItemClick="RecentResolutionFoldersListOnItemClick">
                                     <ListView.ItemContainerStyle>
                                         <Style TargetType="ListViewItem">
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                         </Style>
                                     </ListView.ItemContainerStyle>
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Path}" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Path}" VerticalAlignment="Center" />
                                                 <Button Grid.Column="1" Margin="16,0,0,0" CommandParameter="{Binding}"
                                                         Click="RemoveRecentResolutionFolderOnClick">
-                                                    <SymbolIcon Symbol="Delete"/>
+                                                    <SymbolIcon Symbol="Delete" />
                                                 </Button>
                                             </Grid>
                                         </DataTemplate>
@@ -89,32 +94,36 @@
                                 </ListView>
                             </Flyout>
                         </Button.Flyout>
-                        <SymbolIcon Symbol="SyncFolder"/>
+                        <SymbolIcon Symbol="SyncFolder" />
                     </Button>
                 </StackPanel>
             </StackPanel>
 
-            <Grid Grid.Column="1" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush}" Width="40" Height="40" Margin="0,0,20,0">
+            <Grid Grid.Column="1" VerticalAlignment="Bottom"
+                  Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush}" Width="40"
+                  Height="40" Margin="0,0,20,0">
                 <ToolTipService.ToolTip>
                     <ToolTip>
                         <ItemsControl>
                             <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
-                                <Run Text="• add &quot;tools:managedTypeName&quot; to override Type found in XML"/>
+                                <Run Text="• add &quot;tools:managedTypeName&quot; to override Type found in XML" />
                             </TextBlock>
-                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutSeparator />
                             <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
-                                <Run Text="• provide path to Resources/Layout folder to allow searching for controls referenced in xml includes"/>
+                                <Run
+                                    Text="• provide path to Resources/Layout folder to allow searching for controls referenced in xml includes" />
 
-                            </TextBlock>    
-                            <MenuFlyoutSeparator/>
+                            </TextBlock>
+                            <MenuFlyoutSeparator />
                             <TextBlock IsTextScaleFactorEnabled="True" FontSize="16" TextWrapping="WrapWholeWords">
-                                <Run Text="• add &quot;tools:skipRecursion&quot; to disable recursive resolution of included layouts "/>
+                                <Run
+                                    Text="• add &quot;tools:skipRecursion&quot; to disable recursive resolution of included layouts " />
 
                             </TextBlock>
                         </ItemsControl>
                     </ToolTip>
                 </ToolTipService.ToolTip>
-                <SymbolIcon Symbol="Help"/>
+                <SymbolIcon Symbol="Help" />
             </Grid>
         </Grid>
 
